@@ -1,0 +1,27 @@
+import pandas as pd
+import streamlit as st
+from controllers.main_controller import MainController
+
+def render_dashboard_component(controller: MainController):
+    st.subheader("Dashboard Analítico")
+    records = controller.fetch_all_analyses()
+
+    if not records:
+        st.info("Dados insuficientes para gerar visualizações.")
+        return
+
+    df = pd.DataFrame([{
+        "Data": r.created_at,
+        "Pessoas": r.quantidade_pessoas,
+        "Luminosidade": r.luminosidade,
+        "Nitidez": r.nitidez
+    } for r in records])
+
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total de Análises", len(df))
+    m2.metric("Média de Pessoas Identificadas", round(df["Pessoas"].mean(), 2))
+    m3.metric("Média de Nitidez", round(df["Nitidez"].mean(), 2))
+
+    st.write("---")
+    st.write("**Evolução da Nitidez e Luminosidade**")
+    st.line_chart(df.set_index("Data")[["Luminosidade", "Nitidez"]])

@@ -1,0 +1,17 @@
+import os
+from dotenv import load_dotenv
+from utils.logger import logger
+
+load_dotenv()
+
+class Settings:
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
+    UPLOAD_FOLDER: str = os.getenv("UPLOAD_FOLDER", "images")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "default_secret")
+
+    @classmethod
+    def validate(cls):
+        if not cls.DATABASE_URL:
+            logger.error("DATABASE_URL não configurada no arquivo .env")
+            raise ValueError("DATABASE_URL deve ser definida nas variáveis de ambiente.")
+        os.makedirs(cls.UPLOAD_FOLDER, exist_ok=True)
